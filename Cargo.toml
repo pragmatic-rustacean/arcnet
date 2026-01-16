@@ -2,24 +2,10 @@
 name = "arcnet"
 version = "0.1.0"
 edition = "2024"
+authors = ["James Muriuki", "geniusinrust@gmail.com"]
 
 [workspace]
+resolver = "2"
 members = ["lib", "miner", "node", "wallet"]
 
 [dependencies]
-bigdecimal = "0.4.10"
-chrono = { version = "0.4.42", features = ["serde"] }
-ciborium = "0.2.2"
-ecdsa = { version = "0.16.9", features = [
-  "signing",
-  "verifying",
-  "serde",
-  "pem",
-] }
-hex = "0.4.3"
-k256 = { version = "0.13.4", features = ["serde", "pem"] }
-serde = { version = "1.0.228", features = ["derive"] }
-sha256 = "1.6.0"
-thiserror = "2.0.17"
-uint = "0.10.0"
-uuid = { version = "1.19.0", features = ["v4", "serde"] }
