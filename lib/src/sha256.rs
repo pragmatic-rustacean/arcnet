@@ -6,7 +6,7 @@ use sha256::digest;
 
 use super::U256;
 
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug, Hash)]
 pub(crate) struct Hash(U256);
 
 impl Display for Hash {
@@ -37,7 +37,14 @@ impl Hash {
     pub(self) fn check_matches(&self, target: U256) {
         self.0 <= target;
     }
-    pub(crate) fn zero_hash(&self) -> Self {
+    pub(crate) fn zero_hash() -> Self {
         Self(U256::zero())
+    }
+    pub(crate) fn as_bytes(&self) -> [u8; 32] {
+        let hex_str = format!("{:064x}", self.0);
+        hex::decode(hex_str)
+            .expect("Failed to decode hex string")
+            .try_into()
+            .expect("Failed to convert to [u8; 32]")
     }
 }
