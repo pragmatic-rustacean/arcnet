@@ -1,11 +1,10 @@
-#![allow(unused)]
 use serde::Deserialize;
 use uint::construct_uint;
 
 construct_uint! {
   ///### construct an unsigned 256-bit interger consisting of 4 x 64-bit words.
   #[derive(serde::Serialize, Deserialize)]
-  pub(crate) struct U256(4);
+  pub struct U256(4);
 }
 
 pub mod crypto;
@@ -15,14 +14,14 @@ pub mod types;
 pub mod util;
 
 ///### initial reward in bitcoin - multply by 10^8 to get satoshis'
-pub(crate) const INITIAL_BLOCK_REWARD: u64 = 50;
+pub const INITIAL_BLOCK_REWARD: u64 = 50;
 ///### halving intervals in blocks.
 pub(crate) const HALVING_INTERVAL: u64 = 240;
 /// ideal block time in secs.
 pub(crate) const IDEAL_BLOCK_TIME: u64 = 10;
 ///### minimum target.
 /// Our minimum target only requires the first four hex to be zero.
-pub(crate) const MIN_TARGET: U256 = U256([
+pub const MIN_TARGET: U256 = U256([
     0xFFFF_FFFF_FFFF_FFFF,
     0xFFFF_FFFF_FFFF_FFFF,
     0xFFFF_FFFF_FFFF_FFFF,

@@ -1,5 +1,4 @@
-#![allow(unused)]
-
+#[allow(unused)]
 use thiserror::Error;
 
 #[derive(Debug, Error)]

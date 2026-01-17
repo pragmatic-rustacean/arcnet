@@ -1,7 +1,10 @@
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write},
+};
 
 use super::{
     block::{Block, BlockHeader},
@@ -11,7 +14,7 @@ use crate::{
     U256,
     error::{ArcNetError, Result as ArcResult},
     sha256::Hash,
-    util::MarkleRoot,
+    util::{MarkleRoot, Saveable},
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -23,8 +26,21 @@ pub struct Blockchain {
     mempool: Vec<(DateTime<Utc>, Transaction)>,
 }
 
+/// Save and load expect CBOR from ciborium as format
+impl Saveable for Blockchain {
+    fn load<R: std::io::Read>(reader: R) -> std::io::Result<Self> {
+        ciborium::from_reader(reader)
+            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to deserialize blockchain"))
+    }
+
+    fn save<W: std::io::Write>(&self, writer: W) -> std::io::Result<()> {
+        ciborium::ser::into_writer(self, writer)
+            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to serialize blockchain"))
+    }
+}
+
 impl Blockchain {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             utxos: HashMap::new(),
             blocks: Vec::new(),
@@ -32,24 +48,24 @@ impl Blockchain {
             mempool: Vec::new(),
         }
     }
-    pub(crate) fn utxos(&self) -> &HashMap<Hash, (bool, TransactionOutput)> {
+    pub fn utxos(&self) -> &HashMap<Hash, (bool, TransactionOutput)> {
         &self.utxos
     }
-    pub(crate) fn target(&self) -> U256 {
+    pub fn target(&self) -> U256 {
         self.target
     }
-    pub(crate) fn blocks(&self) -> impl Iterator<Item = &Block> {
+    pub fn blocks(&self) -> impl Iterator<Item = &Block> {
         self.blocks.iter()
     }
     /// Try to add a new block to the blockchain, return an error if it is not valid to insert this block in the blockchain.
-    pub(crate) fn add_block(&mut self, block: Block) -> ArcResult<()> {
+    pub fn add_block(&mut self, block: Block) -> ArcResult<()> {
         if self.blocks.is_empty() {
             if block.header.hash() != Hash::zero_hash() {
                 println!("Zero hash");
                 return Err(ArcNetError::InvalidBlock);
             }
         } else {
-            let mut last_block = self.blocks.last().expect("Failed to get the last block");
+            let last_block = self.blocks.last().expect("Failed to get the last block");
             if block.header.prev_hash_block != last_block.hash() {
                 println!("Hashes did not match.");
                 return Err(ArcNetError::InvalidBlock);
@@ -88,7 +104,7 @@ impl Blockchain {
         Ok(())
     }
 
-    pub(crate) fn rebuild_utxos(&mut self) {
+    pub fn rebuild_utxos(&mut self) {
         for block in &self.blocks {
             for transaction in &block.transactions {
                 for input in &transaction.input {
@@ -102,11 +118,11 @@ impl Blockchain {
         }
     }
 
-    pub(self) fn block_height(&self) -> u64 {
+    pub fn block_height(&self) -> u64 {
         self.blocks.len() as u64
     }
 
-    pub(crate) fn try_adjust_target(&mut self) {
+    pub fn try_adjust_target(&mut self) {
         if self.blocks.is_empty() {
             return;
         }
@@ -157,11 +173,11 @@ impl Blockchain {
     }
 
     // mempool
-    pub(crate) fn mempool(&self) -> &[(DateTime<Utc>, Transaction)] {
+    pub fn mempool(&self) -> &[(DateTime<Utc>, Transaction)] {
         &self.mempool
     }
 
-    pub(crate) fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
+    pub fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
         // Validate transactions before insertion.
         // All inputs must match known UTXOs, and must be unique.
         let mut known_inputs: HashSet<Hash> = HashSet::new();
@@ -263,7 +279,7 @@ impl Blockchain {
         Ok(())
     }
 
-    pub(crate) fn clean_mempool(&mut self) {
+    pub fn clean_mempool(&mut self) {
         let now = Utc::now();
         let mut utxo_hashes_to_unmark: Vec<Hash> = vec![];
         self.mempool.retain(|(timestamp, tx)| {

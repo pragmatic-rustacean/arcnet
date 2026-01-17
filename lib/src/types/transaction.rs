@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
+use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write};
 
 use crate::{
     crypto::{PrivateKey, PublicKey, Signature},
     sha256::Hash,
+    util::Saveable,
 };
 use uuid::Uuid;
 
@@ -18,22 +20,39 @@ pub struct TransactionInput {
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TransactionOutput {
-    pub(super) value: u64,
-    pub(super) unique_id: Uuid,
-    pub(super) pub_key: PublicKey,
+    pub value: u64,
+    pub unique_id: Uuid,
+    pub pub_key: PublicKey,
 }
 
 impl TransactionOutput {
-    pub(crate) fn hash(&self) -> Hash {
+    pub fn hash(&self) -> Hash {
         Hash::hash(&self)
     }
 }
 
 impl Transaction {
-    pub(crate) fn new(input: Vec<TransactionInput>, output: Vec<TransactionOutput>) -> Self {
+    pub fn new(input: Vec<TransactionInput>, output: Vec<TransactionOutput>) -> Self {
         Self { input, output }
     }
-    pub(crate) fn hash(&self) -> Hash {
+    pub fn hash(&self) -> Hash {
         Hash::hash(self)
+    }
+}
+
+/// Save and load expect CBOR from ciborium as format
+impl Saveable for Transaction {
+    fn load<R: std::io::Read>(reader: R) -> std::io::Result<Self> {
+        ciborium::from_reader(reader).map_err(|_| {
+            IOError::new(
+                IOErrorKind::InvalidData,
+                "Failed to deserialize transaction",
+            )
+        })
+    }
+
+    fn save<W: std::io::Write>(&self, writer: W) -> std::io::Result<()> {
+        ciborium::ser::into_writer(self, writer)
+            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to serialize transaction"))
     }
 }

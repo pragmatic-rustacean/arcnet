@@ -1,4 +1,3 @@
-#![allow(unused)]
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
@@ -7,7 +6,7 @@ use sha256::digest;
 use super::U256;
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug, Hash)]
-pub(crate) struct Hash(U256);
+pub struct Hash(U256);
 
 impl Display for Hash {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -37,7 +36,7 @@ impl Hash {
     pub(super) fn matches_target(&self, target: U256) -> bool{
         self.0 <= target
     }
-    pub(crate) fn zero_hash() -> Self {
+    pub fn zero_hash() -> Self {
         Self(U256::zero())
     }
     pub(crate) fn as_bytes(&self) -> [u8; 32] {

@@ -2,8 +2,10 @@ use crate::{
     U256,
     error::{ArcNetError, Result as ArcResult},
     sha256::Hash,
-    util::MarkleRoot,
+    util::{MarkleRoot, Saveable},
 };
+
+use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write};
 
 use super::transaction::{Transaction, TransactionInput, TransactionOutput};
 
@@ -30,18 +32,31 @@ pub struct BlockHeader {
     pub(super) target: U256,
 }
 
+/// Save and load expect CBOR from ciborium as format
+impl Saveable for Block {
+    fn load<R: std::io::Read>(reader: R) -> std::io::Result<Self> {
+        ciborium::from_reader(reader)
+            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to deserialize block"))
+    }
+
+    fn save<W: std::io::Write>(&self, writer: W) -> std::io::Result<()> {
+        ciborium::ser::into_writer(self, writer)
+            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to serialize block"))
+    }
+}
+
 impl Block {
-    pub(crate) fn new(header: BlockHeader, transactions: Vec<Transaction>) -> Self {
+    pub fn new(header: BlockHeader, transactions: Vec<Transaction>) -> Self {
         Self {
             header,
             transactions,
         }
     }
-    pub(crate) fn hash(&self) -> Hash {
+    pub fn hash(&self) -> Hash {
         Hash::hash(self)
     }
 
-    pub(crate) fn verify_transaction(
+    pub fn verify_transaction(
         &self,
         block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -99,7 +114,7 @@ impl Block {
         Ok(())
     }
 
-    pub(super) fn verify_coinbase_transaction(
+    pub fn verify_coinbase_transaction(
         &self,
         predicted_block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -131,7 +146,7 @@ impl Block {
         Ok(())
     }
 
-    pub(super) fn calculate_miners_fee(
+    pub fn calculate_miners_fee(
         &self,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
     ) -> ArcResult<u64> {
@@ -172,7 +187,7 @@ impl Block {
 }
 
 impl BlockHeader {
-    pub(crate) fn new(
+    pub fn new(
         timestamp: DateTime<Utc>,
         nonce: u64,
         prev_hash_block: Hash,
@@ -187,11 +202,11 @@ impl BlockHeader {
             target,
         }
     }
-    pub(crate) fn hash(&self) -> Hash {
+    pub fn hash(&self) -> Hash {
         Hash::hash(self)
     }
 
-    pub(crate) fn mine(&mut self, steps: usize) -> bool {
+    pub fn mine(&mut self, steps: usize) -> bool {
         // If the block already matches the hash return early.
         if self.hash().matches_target(self.target) {
             return true;
