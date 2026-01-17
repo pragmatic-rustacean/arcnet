@@ -34,8 +34,8 @@ impl Hash {
 
         Self(U256::from_big_endian(&hash_array))
     }
-    pub(self) fn check_matches(&self, target: U256) {
-        self.0 <= target;
+    pub(super) fn matches_target(&self, target: U256) -> bool{
+        self.0 <= target
     }
     pub(crate) fn zero_hash() -> Self {
         Self(U256::zero())
