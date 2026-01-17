@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use crate::{U256, sha256::Hash, types::Transaction};
+use crate::{sha256::Hash, types::Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -41,7 +41,7 @@ where
         self.save(file)
     }
     fn load_from_file<P: AsRef<Path> + Read>(&self, path: P) -> IOResult<Self> {
-        let file =
+        let _file =
             File::open(&path).expect("Failed to open the file, maybe the file doesn't exist.");
         Self::load(path)
     }

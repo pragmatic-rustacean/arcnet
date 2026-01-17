@@ -1,14 +1,16 @@
+#![allow(unused)]
+
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{HashMap, HashSet},
-    io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write},
+    io::{Error as IOError, ErrorKind as IOErrorKind},
 };
 
 use super::{
-    block::{Block, BlockHeader},
-    transaction::{Transaction, TransactionInput, TransactionOutput},
+    block::Block,
+    transaction::{Transaction, TransactionOutput},
 };
 use crate::{
     U256,
@@ -58,7 +60,7 @@ impl Blockchain {
         self.blocks.iter()
     }
     /// Try to add a new block to the blockchain, return an error if it is not valid to insert this block in the blockchain.
-    pub fn add_block(&mut self, block: Block) -> ArcResult<()> {
+    pub(crate) fn add_block(&mut self, block: Block) -> ArcResult<()> {
         if self.blocks.is_empty() {
             if block.header.hash() != Hash::zero_hash() {
                 println!("Zero hash");
@@ -96,7 +98,7 @@ impl Blockchain {
                 .expect("Failed to verify transactions. @types.rs/line 103");
         };
         // Remove transactions from mempo ol that are now part in the block.
-        let tx_block: HashSet<_> = block.transactions.iter().map(|tx| tx.hash()).collect();
+        let _tx_block: HashSet<_> = block.transactions.iter().map(|tx| tx.hash()).collect();
         // self.mempool.retain(|(_, tx)| );
         self.blocks.push(block.clone());
         self.try_adjust_target();
@@ -177,7 +179,7 @@ impl Blockchain {
         &self.mempool
     }
 
-    pub fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
+    pub(self) fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
         // Validate transactions before insertion.
         // All inputs must match known UTXOs, and must be unique.
         let mut known_inputs: HashSet<Hash> = HashSet::new();
@@ -210,7 +212,7 @@ impl Blockchain {
 
                 // if we've found one unmark all of it's UTXOS.
                 if let Some((idx, (_, ref_tx))) = ref_tx {
-                    for tx_inputs in &ref_tx.input {
+                    for _tx_inputs in &ref_tx.input {
                         // set all UTXO's from this transaction to false.
                         self.utxos
                             .entry(tx_input.prev_transaction_output_hash)
@@ -269,7 +271,7 @@ impl Blockchain {
                     .value
             }).sum::<u64>();
 
-            let all_output_values = tx.output.iter().map(|(tx_output)|tx_output.value).sum::<u64>();
+            let all_output_values = tx.output.iter().map(|tx_output|tx_output.value).sum::<u64>();
 
             let miners_fee =  all_input_values - all_output_values;
 
@@ -290,7 +292,7 @@ impl Blockchain {
                 utxo_hashes_to_unmark.extend(
                     tx.input
                         .iter()
-                        .map(|(tx_input)| tx_input.prev_transaction_output_hash),
+                        .map(|tx_input| tx_input.prev_transaction_output_hash),
                 );
                 false
             } else {

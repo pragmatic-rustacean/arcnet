@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
-use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write};
+use std::io::{Error as IOError, ErrorKind as IOErrorKind};
 
 use crate::{
-    crypto::{PrivateKey, PublicKey, Signature},
+    crypto::{PublicKey, Signature},
     sha256::Hash,
     util::Saveable,
 };

@@ -5,13 +5,13 @@ use crate::{
     util::{MarkleRoot, Saveable},
 };
 
-use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Result as IOResult, Write};
+use std::io::{Error as IOError, ErrorKind as IOErrorKind};
 
-use super::transaction::{Transaction, TransactionInput, TransactionOutput};
+use super::transaction::{Transaction, TransactionOutput};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Block {
@@ -56,7 +56,7 @@ impl Block {
         Hash::hash(self)
     }
 
-    pub fn verify_transaction(
+    pub(super) fn verify_transaction(
         &self,
         block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -66,7 +66,7 @@ impl Block {
             return Err(ArcNetError::InvalidTransaction);
         }
 
-        self.verify_coinbase_transaction(block_height, &utxos);
+        let _ = self.verify_coinbase_transaction(block_height, &utxos);
 
         for transaction in self.transactions.iter().skip(1) {
             let mut tx_output = 0;
@@ -114,7 +114,7 @@ impl Block {
         Ok(())
     }
 
-    pub fn verify_coinbase_transaction(
+    pub(self) fn verify_coinbase_transaction(
         &self,
         predicted_block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -146,7 +146,7 @@ impl Block {
         Ok(())
     }
 
-    pub fn calculate_miners_fee(
+    pub(in self) fn calculate_miners_fee(
         &self,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
     ) -> ArcResult<u64> {
