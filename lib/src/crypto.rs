@@ -1,13 +1,13 @@
+use crate::{sha256::Hash, util::Saveable};
 use ecdsa::{
     SigningKey, VerifyingKey,
     der::Signature as ECDSASignature,
     signature::{SignerMut, Verifier},
 };
-use k256::Secp256k1;
+use k256::{Secp256k1, pkcs8::EncodePublicKey};
 use rand::rngs;
 use serde::{Deserialize, Serialize};
-
-use crate::sha256::Hash;
+use std::io::{Error as IOError, ErrorKind};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Signature(ECDSASignature<Secp256k1>);
@@ -15,6 +15,43 @@ pub struct Signature(ECDSASignature<Secp256k1>);
 pub struct PublicKey(VerifyingKey<Secp256k1>);
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PrivateKey(#[serde(with = "signkey_serde")] pub SigningKey<Secp256k1>);
+
+impl Saveable for PrivateKey {
+    fn load<R: std::io::Read>(reader: R) -> std::io::Result<Self> {
+        ciborium::from_reader(reader)
+            .map_err(|_| IOError::new(ErrorKind::InvalidData, "Failed to deserialize private key"))
+    }
+
+    fn save<W: std::io::Write>(&self, writer: W) -> std::io::Result<()> {
+        ciborium::into_writer(&self, writer)
+            .map_err(|_| IOError::new(ErrorKind::InvalidData, "Failed to serialize private key"))?;
+
+        Ok(())
+    }
+}
+
+impl Saveable for PublicKey {
+    fn load<R: std::io::Read>(mut reader: R) -> std::io::Result<Self> {
+        // Read PEM-encoded public key into string.
+        let mut buf = String::new();
+        let _ = reader.read_to_string(&mut buf);
+        let public_key = buf.parse().map_err(|_| {
+            IOError::new(ErrorKind::InvalidData, "Failed to deserialize public key")
+        })?;
+
+        Ok(PublicKey(public_key))
+    }
+
+    fn save<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        let s = self
+            .0
+            .to_public_key_pem(Default::default())
+            .map_err(|_| IOError::new(ErrorKind::InvalidData, "Failed to serialize public key"))?;
+
+        let _ = writer.write_all(s.as_bytes())?;
+        Ok(())
+    }
+}
 
 mod signkey_serde {
     use ecdsa::SigningKey;

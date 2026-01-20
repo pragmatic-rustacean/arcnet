@@ -9,3 +9,4 @@ resolver = "2"
 members = ["lib", "miner", "node", "wallet"]
 
 [dependencies]
+tokio = { version = "1.49.0", features = ["full"] }

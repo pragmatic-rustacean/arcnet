@@ -15,8 +15,8 @@ use std::collections::{HashMap};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Block {
-    pub(crate) header: BlockHeader,
-    pub(crate) transactions: Vec<Transaction>,
+    pub header: BlockHeader,
+    pub transactions: Vec<Transaction>,
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BlockHeader {
@@ -29,7 +29,7 @@ pub struct BlockHeader {
     /// Merkle root of the block transaction.
     pub(super) markle_root: MarkleRoot,
     /// Target
-    pub(super) target: U256,
+    pub target: U256,
 }
 
 /// Save and load expect CBOR from ciborium as format

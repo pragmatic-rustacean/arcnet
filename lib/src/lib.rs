@@ -9,6 +9,7 @@ construct_uint! {
 
 pub mod crypto;
 pub mod error;
+pub mod network;
 pub mod sha256;
 pub mod types;
 pub mod util;
@@ -33,3 +34,5 @@ pub const MIN_TARGET: U256 = U256([
 pub(crate) const DIFFICULTY_UPDATE_INTERVAL: u64 = 50;
 /// maximum mempool transactions in secs
 pub(crate) const MAX_MEMPOOL_TRANSACTION_AGE: u64 = 600;
+/// Maximum amount of transactions allowed for a block
+pub const BLOCK_TRANSACTION_CAP: usize = 20;

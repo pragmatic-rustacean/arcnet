@@ -40,9 +40,9 @@ where
         let file = File::create(path).expect("Failed to create a file @util/line 40");
         self.save(file)
     }
-    fn load_from_file<P: AsRef<Path> + Read>(&self, path: P) -> IOResult<Self> {
-        let _file =
+    fn load_from_file<P: AsRef<Path>>(path: P) -> IOResult<Self> {
+        let file =
             File::open(&path).expect("Failed to open the file, maybe the file doesn't exist.");
-        Self::load(path)
+        Self::load(file)
     }
 }
