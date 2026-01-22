@@ -41,7 +41,7 @@ where
         self.save(file)
     }
     fn load_from_file<P: AsRef<Path>>(path: P) -> IOResult<Self> {
-        let file =
+        let  file =
             File::open(&path).expect("Failed to open the file, maybe the file doesn't exist.");
         Self::load(file)
     }

@@ -21,18 +21,29 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Blockchain {
+    #[serde(default)]
     blocks: Vec<Block>,
+    #[serde(default)]
     utxos: HashMap<Hash, (bool, TransactionOutput)>,
+    #[serde(default = "default_target")]
     target: U256,
     #[serde(default, skip_serializing)]
     mempool: Vec<(DateTime<Utc>, Transaction)>,
 }
 
+fn default_target() -> U256 {
+    crate::MIN_TARGET
+}
+
 /// Save and load expect CBOR from ciborium as format
 impl Saveable for Blockchain {
-    fn load<R: std::io::Read>(reader: R) -> std::io::Result<Self> {
-        ciborium::from_reader(reader)
-            .map_err(|_| IOError::new(IOErrorKind::InvalidData, "Failed to deserialize blockchain"))
+    fn load<R: std::io::Read>(mut reader: R) -> std::io::Result<Self> {
+        ciborium::de::from_reader(reader).map_err(|err| {
+            IOError::new(
+                IOErrorKind::InvalidData,
+                format!("failed to deserialize blockchain: {err}"),
+            )
+        })
     }
 
     fn save<W: std::io::Write>(&self, writer: W) -> std::io::Result<()> {
@@ -60,15 +71,15 @@ impl Blockchain {
         self.blocks.iter()
     }
     /// Try to add a new block to the blockchain, return an error if it is not valid to insert this block in the blockchain.
-    pub(crate) fn add_block(&mut self, block: Block) -> ArcResult<()> {
+    pub fn add_block(&mut self, block: Block) -> ArcResult<()> {
         if self.blocks.is_empty() {
-            if block.header.hash() != Hash::zero_hash() {
+            if block.header.hash() != Hash::zero() {
                 println!("Zero hash");
                 return Err(ArcNetError::InvalidBlock);
             }
         } else {
             let last_block = self.blocks.last().expect("Failed to get the last block");
-            if block.header.prev_hash_block != last_block.hash() {
+            if block.header.prev_block_hash != last_block.hash() {
                 println!("Hashes did not match.");
                 return Err(ArcNetError::InvalidBlock);
             }
@@ -179,7 +190,7 @@ impl Blockchain {
         &self.mempool
     }
 
-    pub(self) fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
+    pub fn add_to_mempool(&mut self, tx: Transaction) -> ArcResult<()> {
         // Validate transactions before insertion.
         // All inputs must match known UTXOs, and must be unique.
         let mut known_inputs: HashSet<Hash> = HashSet::new();
@@ -305,5 +316,10 @@ impl Blockchain {
                 .entry(utxo_hash)
                 .and_modify(|(marked, _)| *marked = false);
         }
+    }
+    pub fn calculate_block_reward(&self) -> u64 {
+        let block_height = self.block_height();
+        let halvings = block_height / crate::HALVING_INTERVAL;
+        (crate::INITIAL_BLOCK_REWARD * 10u64.pow(8)) >> halvings
     }
 }

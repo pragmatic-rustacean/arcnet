@@ -2,7 +2,7 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub(crate) enum ArcNetError {
+pub enum ArcNetError {
     #[error("Invalid transaction")]
     InvalidTransaction,
     #[error("Invalid block")]
@@ -25,4 +25,4 @@ pub(crate) enum ArcNetError {
     InvalidSignature,
 }
 
-pub(crate) type Result<T> = std::result::Result<T, ArcNetError>;
+pub type Result<T> = std::result::Result<T, ArcNetError>;

@@ -29,7 +29,7 @@ fn main() {
         BlockHeader::new(
             Utc::now(),
             0,
-            Hash::zero_hash(),
+            Hash::zero(),
             markle_root,
             lib::MIN_TARGET,
         ),

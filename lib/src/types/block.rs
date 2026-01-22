@@ -11,7 +11,7 @@ use super::transaction::{Transaction, TransactionOutput};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Block {
@@ -21,13 +21,13 @@ pub struct Block {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BlockHeader {
     /// Timestamp of the block
-    pub(super) timestamp: DateTime<Utc>,
+    pub timestamp: DateTime<Utc>,
     /// Nonce used to mine the block
-    pub(super) nonce: u64,
+    pub nonce: u64,
     /// Hash of the previous block
-    pub(super) prev_hash_block: Hash,
+    pub prev_block_hash: Hash,
     /// Merkle root of the block transaction.
-    pub(super) markle_root: MarkleRoot,
+    pub markle_root: MarkleRoot,
     /// Target
     pub target: U256,
 }
@@ -56,7 +56,7 @@ impl Block {
         Hash::hash(self)
     }
 
-    pub(super) fn verify_transaction(
+    pub fn verify_transaction(
         &self,
         block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -114,7 +114,7 @@ impl Block {
         Ok(())
     }
 
-    pub(self) fn verify_coinbase_transaction(
+    pub fn verify_coinbase_transaction(
         &self,
         predicted_block_height: u64,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
@@ -146,7 +146,7 @@ impl Block {
         Ok(())
     }
 
-    pub(in self) fn calculate_miners_fee(
+    pub fn calculate_miners_fee(
         &self,
         utxos: &HashMap<Hash, (bool, TransactionOutput)>,
     ) -> ArcResult<u64> {
@@ -197,7 +197,7 @@ impl BlockHeader {
         Self {
             timestamp,
             nonce,
-            prev_hash_block,
+            prev_block_hash: prev_hash_block,
             markle_root,
             target,
         }

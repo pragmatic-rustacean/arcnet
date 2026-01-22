@@ -10,13 +10,13 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Transaction {
-    pub(super) input: Vec<TransactionInput>,
-    pub(super) output: Vec<TransactionOutput>,
+    pub input: Vec<TransactionInput>,
+    pub output: Vec<TransactionOutput>,
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TransactionInput {
-    pub(super) prev_transaction_output_hash: Hash,
-    pub(super) signature: Signature,
+    pub prev_transaction_output_hash: Hash,
+    pub signature: Signature,
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TransactionOutput {

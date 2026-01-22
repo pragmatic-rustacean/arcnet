@@ -36,7 +36,7 @@ impl Hash {
     pub(super) fn matches_target(&self, target: U256) -> bool{
         self.0 <= target
     }
-    pub fn zero_hash() -> Self {
+    pub fn zero() -> Self {
         Self(U256::zero())
     }
     pub(crate) fn as_bytes(&self) -> [u8; 32] {
