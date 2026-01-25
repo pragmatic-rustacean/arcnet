@@ -1,0 +1,23 @@
+[2m2026-01-25T16:28:38.116781Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:28:38.120870Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Loading config from: "wallet_config.toml"
+[2m2026-01-25T16:28:38.121030Z[0m [32m INFO[0m [2mwallet::core[0m[2m:[0m Loading from config: "wallet_config.toml"
+[2m2026-01-25T16:41:43.497307Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:41:43.499430Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Loading config from: "wallet_config.toml"
+[2m2026-01-25T16:41:43.499506Z[0m [32m INFO[0m [2mwallet::core[0m[2m:[0m Loading from config: "wallet_config.toml"
+[2m2026-01-25T16:53:49.463929Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:53:49.466485Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Loading config from: "wallet_config.toml"
+[2m2026-01-25T16:53:49.466549Z[0m [32m INFO[0m [2mwallet::core[0m[2m:[0m Loading from config: "wallet_config.toml"
+[2m2026-01-25T16:54:44.357933Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:54:59.585512Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:55:04.057895Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T16:55:12.567318Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:00:12.198373Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:02:16.850759Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:02:16.853257Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Loading config from: "wallet_config.toml"
+[2m2026-01-25T18:02:16.853317Z[0m [32m INFO[0m [2mwallet::core[0m[2m:[0m Loading from config: "wallet_config.toml"
+[2m2026-01-25T18:05:04.858029Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:05:04.861729Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Loading config from: "wallet_config.toml"
+[2m2026-01-25T18:05:04.861840Z[0m [32m INFO[0m [2mwallet::core[0m[2m:[0m Loading from config: "wallet_config.toml"
+[2m2026-01-25T18:05:31.965232Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:05:47.176731Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
+[2m2026-01-25T18:05:57.263660Z[0m [32m INFO[0m [2mwallet[0m[2m:[0m Starting wallet application
